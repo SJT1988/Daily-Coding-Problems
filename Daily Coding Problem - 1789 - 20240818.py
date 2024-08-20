@@ -1,6 +1,8 @@
-# Daily Coding Problem: Problem #1782
-# 2024-08-11
+# Daily Coding Problem: Problem #1789
+# 2024-08-18
 # Author: Spencer Trumbore
+
+# "Listeners and Towers Problem"
 
 '''
 You are the technical director of WSPT radio, serving listeners nationwide.
@@ -16,37 +18,54 @@ In this case the minimum range would be 5, since that would be required for
 the tower at position 15 to reach the listener at position 20.
 '''
 
-# Minimum Broadcast Range"
+# note: This solution requires sorted lists of listeners and towers.
+# credit to Pavan Kumar Mungara for this optimized strategy O(m+n)
 
 import random
+import sys
 
 def main():
     listeners = []
     towers = []
-    populate_list(listeners, 4, 5)
-    populate_list(towers, 2, 3)
-    min_distance = get_min_distance(listeners, towers)
+    populate_list(listeners,5,6)
+    populate_list(towers,2,4)
+    maxRange = find_max_range(listeners, towers)
 
     print("listeners: " + str(listeners))
     print("towers: " + str(towers))
-    print("Minimum Broadcast Range: " + str(min_distance))
-    return
-
-def get_min_distance(lst_listeners: list[int], lst_towers: list[int]) -> int:
-    min_distances = set()
-    for i in lst_listeners:
-        min_dist = 1000
-        for j in lst_towers:
-            if abs(i - j) < min_dist:
-                min_dist = abs(i - j)
-        min_distances.add(min_dist)
-    return max(min_distances)
+    print("Max Range: " + str(maxRange))
 
 def populate_list(lst: list[int], min_size: int, max_size: int) -> None:
     size = random.randint(min_size, max_size)
     for i in range(size):
-        lst.append(random.randint(0,1000))
+        lst.append(random.randint(0,100))
     lst.sort()
+
+def find_max_range(listeners: list[int], towers: list[int]) -> int:
+    m = len(listeners)
+    n = len(towers)
+    towerL = 1-sys.maxsize
+    towerR = towers[0]
+    i,j = 0,0 # listener index, tower index
+    distMax = 0
+
+    while (i < m):
+        if (listeners[i] < towerR):
+            distL = listeners[i] - towerL
+            distR = towerR - listeners[i]
+            distMin = distL if distL < distR else distR
+            if (distMin > distMax):
+                distMax = distMin
+            i+=1
+        else:
+            # increment tower indices
+            towerL = towers[j]
+            if (j < n-1):
+                j+=1
+                towerR = towers[j]
+            else:
+                towerR = sys.maxsize
+    return distMax
 
 if __name__ == '__main__':
     main()
